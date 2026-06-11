@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://koreameme003.github.io/adpick/sitemap.xml

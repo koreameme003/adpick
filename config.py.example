@@ -1,0 +1,22 @@
+# 1. API 설정
+GROQ_API_KEY = "your_groq_api_key_here"
+
+# 2. 블로그 설정
+NAVER_ID = "your_naver_id"
+NAVER_PW = "your_naver_password"
+
+TISTORY_ID = "your_tistory_id"
+TISTORY_PW = "your_tistory_password"
+TISTORY_BLOG_NAME = "your_blog_name"
+
+NAVER_SESSION_PATH = "naver_session.json"
+TISTORY_SESSION_PATH = "tistory_session.json"
+
+# 3. 포스팅 설정
+AUTO_PUBLISH_TISTORY = False
+AUTO_SAVE_DRAFT_NAVER = False
+
+# 4. 텐핑(Tenping) 설정
+TENPING_ID = "your_tenping_id"
+TENPING_PW = "your_tenping_password"
+TENPING_SESSION_PATH = "tenping_session.json"

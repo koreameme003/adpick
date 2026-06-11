@@ -1,0 +1,75 @@
+# Site Settings
+title: "스마트 제휴 마케팅 블로그"
+tagline: "실시간 정보와 스마트 라이프 혜택 가이드"
+description: "실시간 트렌드 이슈, AI 최신 뉴스 및 애드픽의 스마트한 앱테크/제휴 혜택 정보를 엄선하여 전달해 드립니다."
+url: "https://koreameme003.github.io"
+baseurl: "/adpick"
+
+# Include
+include:
+  - _pages
+
+# Authors
+authors:
+  admin:
+    name: "AdpickBlog"
+    display_name: "AdpickBlog Admin"
+    avatar: "/assets/images/logo.png"
+    web: "https://koreameme003.github.io/adpick"
+    description: "AI 분석을 활용하여 최신 트렌드 뉴스 및 현대인에게 꼭 필요한 가입 혜택, 유용한 리워드 앱테크 정보를 제공합니다."
+
+# Permalinks
+permalink: /:title/
+
+# Pagination
+paginate: 6
+paginate_path: /page:num/
+
+# Archives
+jekyll-archives:
+  enabled:
+    - categories
+    - tags
+  layout: archive
+  permalinks:
+    category: /category/:name/
+    tag: /tag/:name/
+
+# Plugins
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-archives
+
+# Markdown Configuration
+markdown: kramdown
+highlighter: rouge
+
+# Excludes (Jekyll 빌드에서 제외할 개발/실행 리소스)
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/
+  - venv/
+  - .env
+  - .env.template
+  - main.py
+  - keyword_analyzer.py
+  - adpick_partner.py
+  - content_writer.py
+  - telegram_notifier.py
+  - requirements.txt
+  - campaign_cache.json
+  - debug_tenping.py
+  - login_manager.py
+  - login_tenping_manual.py
+  - poster.py
+  - relogin.py
+  - tenping.py
+  - generator.py
+  - config.py.example
+  - .git/
+  - .github/

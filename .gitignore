@@ -1,0 +1,33 @@
+# Python caches and virtualenvs
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Secrets
+.env
+config.py
+
+# API Campaign Cache
+campaign_cache.json
+
+# Temporary files and logs
+temp_images/
+links_output.txt
+tenping_links.txt
+tenping_debug.html
+tenping_debug.png
+*.log
+
+# Jekyll build output and caches
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
+
+# IDEs
+.vscode/
+.idea/
