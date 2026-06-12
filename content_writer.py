@@ -234,6 +234,13 @@ class ContentWriter:
             image_path = f"assets/images/{img_idx}.jpg"
 
         description = _make_description(body)
+
+        # 태그 목록 가공: 대괄호 제거 및 개별 태그 쌍따옴표 처리로 YAML 에러 방지
+        raw_tags = tag_map.get(category, keyword)
+        tags_list = [t.strip() for t in raw_tags.split(",") if t.strip()]
+        cleaned_tags = [t.replace("[", "").replace("]", "").replace('"', '\\"').strip() for t in tags_list]
+        formatted_tags = ", ".join(f'"{t}"' for t in cleaned_tags)
+
         front_matter = (
             f"---\n"
             f"layout: post\n"
@@ -244,7 +251,7 @@ class ContentWriter:
             f"author: admin\n"
             f"description: \"{description}\"\n"
             f"categories: {cat_map.get(category, 'general')}\n"
-            f"tags: [{tag_map.get(category, keyword)}]\n"
+            f"tags: [{formatted_tags}]\n"
             f"---\n\n"
         )
 
