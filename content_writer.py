@@ -10,6 +10,7 @@ import os
 import re
 import hashlib
 import logging
+import time
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -303,18 +304,25 @@ class ContentWriter:
 5. 맨 마지막에 공정위 안내 문구 삽입: "이 포스팅은 애드픽 제휴마케팅 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
 {FORMAT_INSTRUCTION}
 """
-        try:
-            response = self.gemini_client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=user,
-                config=genai.types.GenerateContentConfig(
-                    system_instruction=system
+        for attempt in range(2):  # 최대 2회 시도
+            try:
+                response = self.gemini_client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=user,
+                    config=genai.types.GenerateContentConfig(
+                        system_instruction=system
+                    )
                 )
-            )
-            return response.text.strip()
-        except Exception as e:
-            logger.error(f"Gemini API 호출 실패(adpick): {e}")
-            return self._gpt_adpick_post(topic)
+                return response.text.strip()
+            except Exception as e:
+                err_str = str(e)
+                if '429' in err_str and attempt == 0:
+                    logger.warning(f"Gemini API 429 쿼터 초과(adpick). 30초 대기 후 재시도...")
+                    time.sleep(30)
+                    continue
+                logger.error(f"Gemini API 호출 실패(adpick): {e}")
+                return self._gpt_adpick_post(topic)
+        return self._gpt_adpick_post(topic)
 
     def _gpt_adpick_post(self, topic: dict) -> str:
         if not self.client:
@@ -492,18 +500,25 @@ class ContentWriter:
 4. 결론: 앞으로 주목해야 할 포인트 + 독자 행동 유도
 {FORMAT_INSTRUCTION}
 """
-        try:
-            response = self.gemini_client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=user,
-                config=genai.types.GenerateContentConfig(
-                    system_instruction=system
+        for attempt in range(2):
+            try:
+                response = self.gemini_client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=user,
+                    config=genai.types.GenerateContentConfig(
+                        system_instruction=system
+                    )
                 )
-            )
-            return response.text.strip()
-        except Exception as e:
-            logger.error(f"Gemini API 호출 실패(ai_news): {e}")
-            return self._fallback_ai_news_body(title, summary)
+                return response.text.strip()
+            except Exception as e:
+                err_str = str(e)
+                if '429' in err_str and attempt == 0:
+                    logger.warning("Gemini API 429 쿼터 초과(ai_news). 30초 대기 후 재시도...")
+                    time.sleep(30)
+                    continue
+                logger.error(f"Gemini API 호출 실패(ai_news): {e}")
+                return self._fallback_ai_news_body(title, summary)
+        return self._fallback_ai_news_body(title, summary)
 
     def _fallback_ai_news_body(self, title: str, summary: str) -> str:
         h = hashlib.md5(title.encode('utf-8')).hexdigest()[:6]
@@ -585,18 +600,26 @@ AI 트렌드는 단순한 기술 이슈를 넘어 **투자·취업·교육** 전
 4. 결론: 이슈의 핵심 시사점 정리 및 독자들과 소통을 유도하는 맺음말.
 {FORMAT_INSTRUCTION}
 """
-        try:
-            response = self.gemini_client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=user,
-                config=genai.types.GenerateContentConfig(
-                    system_instruction=system
+        for attempt in range(2):  # 최대 2회 시도 (첫 시도 + 429 발생 시 1회 재시도)
+            try:
+                response = self.gemini_client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=user,
+                    config=genai.types.GenerateContentConfig(
+                        system_instruction=system
+                    )
                 )
-            )
-            return response.text.strip()
-        except Exception as e:
-            logger.error(f"Gemini API 호출 실패(latest_issue): {e}")
-            return self._fallback_issue_body(title, summary)
+                return response.text.strip()
+            except Exception as e:
+                err_str = str(e)
+                if '429' in err_str and attempt == 0:
+                    # 429 쿼터 초과 시 30초 대기 후 재시도
+                    logger.warning(f"Gemini API 429 쿼터 초과(latest_issue). 30초 대기 후 재시도...")
+                    time.sleep(30)
+                    continue
+                logger.error(f"Gemini API 호출 실패(latest_issue): {e}")
+                return self._fallback_issue_body(title, summary)
+        return self._fallback_issue_body(title, summary)
 
     def _fallback_issue_body(self, title: str, summary: str) -> str:
         h = hashlib.md5(title.encode('utf-8')).hexdigest()[:6]
