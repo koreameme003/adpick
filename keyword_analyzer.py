@@ -114,12 +114,32 @@ class KeywordAnalyzer:
     # ──────────────────────────────────────────
     # ③ 최신 이슈 크롤러 (그대로 유지)
     # ──────────────────────────────────────────
+    def _fetch_related_news(self, keyword: str) -> str:
+        """구글 뉴스 RSS를 활용해 키워드와 관련된 최신 기사 3~5개의 제목을 수집한다."""
+        url = f"https://news.google.com/rss/search?q={keyword}&hl=ko&gl=KR&ceid=KR:ko"
+        try:
+            r = requests.get(url, headers=self._headers(), timeout=10)
+            xml_data = r.content.decode('utf-8')
+            root = ET.fromstring(xml_data)
+            news_titles = []
+            for item in root.findall(".//item")[:5]:  # 상위 5개 기사
+                title_el = item.find("title")
+                if title_el is not None and title_el.text:
+                    news_titles.append(title_el.text.strip())
+            if news_titles:
+                return " | ".join(f"{i+1}. {title}" for i, title in enumerate(news_titles))
+        except Exception as e:
+            logging.warning(f"관련 뉴스 수집 실패 ({keyword}): {e}")
+        return ""
+
     def get_latest_issue_topic(self) -> dict:
         """Google 트렌드 RSS에서 실시간 급상승 이슈를 가져온다."""
         url = "https://trends.google.com/trending/rss?geo=KR"
         try:
             r = requests.get(url, headers=self._headers(), timeout=10)
-            root = ET.fromstring(r.content)
+            # UTF-8 강제 디코딩으로 한글 깨짐 원천 방지
+            xml_data = r.content.decode('utf-8')
+            root = ET.fromstring(xml_data)
             items = []
             for item in root.findall(".//item"):
                 title_el = item.find("title")
@@ -132,6 +152,12 @@ class KeywordAnalyzer:
             if items:
                 chosen = random.choice(items[:15])
                 logging.info(f"[최신 이슈] 선정: {chosen['title']}")
+                
+                # 추가: 관련 실시간 뉴스 맥락 수집
+                news_context = self._fetch_related_news(chosen['title'])
+                if news_context:
+                    chosen['summary'] = f"{chosen['summary']} | 관련 뉴스: {news_context}"
+                
                 return chosen
         except Exception as e:
             logging.warning(f"구글 트렌드 RSS 수집 실패: {e}")
