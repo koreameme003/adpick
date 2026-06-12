@@ -277,6 +277,12 @@ class ContentWriter:
             "스팸성 광고 느낌을 최소화하고, 신뢰성 있는 정보성 가이드나 사용 혜택 중심 스토리텔링을 통해 "
             "독자에게 진정한 가치를 전달하며 가입/설치를 자연스럽게 유도하는 마크다운 포스팅을 작성한다."
         )
+        # 이미지 URL이 비어있으면 기본 이미지로 대체 (엑박 방지)
+        image_url = topic.get('image_url', '')
+        if not image_url or not image_url.startswith('http'):
+            h_val = int(hashlib.md5(topic['title'].encode('utf-8')).hexdigest(), 16)
+            img_idx = (h_val % 17) + 1
+            image_url = f"/adpick/assets/images/{img_idx}.jpg"
         user = f"""
 캠페인 정보:
 - 제목: {topic['title']}
@@ -284,14 +290,14 @@ class ContentWriter:
 - 캠페인 유형: {topic['type_label']}
 - 상세 소개글: {topic['promo_text']}
 - 트래킹 링크: {topic['tracking_link']}
-- 이미지 경로: {topic.get('image_url', '')}
+- 이미지 경로: {image_url}
 
 규칙:
 1. 제목(#): 호기심을 유발하고 유용한 가치를 약속하는 후킹성 매력적인 제목. (예: "매달 나가는 돈 30% 줄이는 비결, 드디어 공개된 대안은?")
 2. 서론: 일상적인 공감대나 문제 상황 제시 (예: 고물가, 시간 낭비, 정보 불균형 등)로 독자의 몰입 유도.
 3. 본문: 캠페인이 해결해 줄 수 있는 구체적인 혜택과 장점을 3가지 소주제로 나누어 체계적으로 분석.
          글 중간 적절한 위치에 해당 제품/앱의 이미지와 다운로드/가입 버튼(트래킹 링크 활용)을 자연스럽게 융합.
-         이미지 표현: ![캠페인이미지]({topic.get('image_url', '')})
+         이미지 표현: ![캠페인이미지]({image_url})
          가입/설치 버튼 표현: <a href="{topic['tracking_link']}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 20px;background-color:#1e90ff;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">▶ {topic['title']} 자세히 알아보기</a>
 4. 결론: 한 줄 총평 및 지금 행동해야 하는 이유 소구 (예: 선착순 혜택, 한정 이벤트 등).
 5. 맨 마지막에 공정위 안내 문구 삽입: "이 포스팅은 애드픽 제휴마케팅 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
@@ -319,6 +325,12 @@ class ContentWriter:
             "스팸성 광고 느낌을 최소화하고, 신뢰성 있는 정보성 가이드나 사용 혜택 중심 스토리텔링을 통해 "
             "독자에게 진정한 가치를 전달하며 가입/설치를 자연스럽게 유도하는 마크다운 포스팅을 작성한다."
         )
+        # 이미지 URL이 비어있으면 기본 이미지로 대체 (엑박 방지)
+        image_url = topic.get('image_url', '')
+        if not image_url or not image_url.startswith('http'):
+            h_val = int(hashlib.md5(topic['title'].encode('utf-8')).hexdigest(), 16)
+            img_idx = (h_val % 17) + 1
+            image_url = f"/adpick/assets/images/{img_idx}.jpg"
         user = f"""
 캠페인 정보:
 - 제목: {topic['title']}
@@ -326,14 +338,14 @@ class ContentWriter:
 - 캠페인 유형: {topic['type_label']}
 - 상세 소개글: {topic['promo_text']}
 - 트래킹 링크: {topic['tracking_link']}
-- 이미지 경로: {topic.get('image_url', '')}
+- 이미지 경로: {image_url}
 
 규칙:
 1. 제목(#): 호기심을 유발하고 유용한 가치를 약속하는 후킹성 매력적인 제목.
 2. 서론: 일상적인 공감대나 문제 상황 제시로 독자의 몰입 유도.
 3. 본문: 캠페인이 해결해 줄 수 있는 구체적인 혜택과 장점을 3가지 소주제로 나누어 체계적으로 분석.
          글 중간 적절한 위치에 해당 제품/앱의 이미지와 다운로드/가입 버튼(트래킹 링크 활용)을 자연스럽게 융합.
-         이미지 표현: ![캠페인이미지]({topic.get('image_url', '')})
+         이미지 표현: ![캠페인이미지]({image_url})
          가입/설치 버튼 표현: <a href="{topic['tracking_link']}" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:10px 20px;background-color:#1e90ff;color:#fff;text-decoration:none;border-radius:6px;font-weight:bold;">▶ {topic['title']} 자세히 알아보기</a>
 4. 결론: 한 줄 총평 및 지금 행동해야 하는 이유 소구.
 5. 맨 마지막에 공정위 안내 문구 삽입: "이 포스팅은 애드픽 제휴마케팅 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다."
@@ -353,6 +365,13 @@ class ContentWriter:
         h = hashlib.md5(topic['title'].encode('utf-8')).hexdigest()[:6]
         slug = f"adpick-{h}"
         title = f"\"모르면 100% 손해!\" 요즘 직장인들 사이 난리난 {topic['title']} 솔직 후기 및 팁"
+        
+        # 이미지 URL이 비어있으면 기본 이미지로 대체 (엑박 방지)
+        image_url = topic.get('image_url', '')
+        if not image_url or not image_url.startswith('http'):
+            h_val = int(hashlib.md5(topic['title'].encode('utf-8')).hexdigest(), 16)
+            img_idx = (h_val % 17) + 1
+            image_url = f"/adpick/assets/images/{img_idx}.jpg"
         
         body = f"""
 "남들은 다 챙기고 있는데 나만 모르고 살았던 혜택, 혹시 있으신가요?"
@@ -388,7 +407,7 @@ class ContentWriter:
 
 ## 📸 이미지 및 바로가기
 
-![캠페인이미지]({topic.get('image_url', '')})
+![캠페인이미지]({image_url})
 
 아래 링크를 통해 공식 페이지로 이동하여 상세 내용을 직접 확인하고 가장 빠른 혜택을 챙겨보세요.
 
